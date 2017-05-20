@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+    <script src="scripts/zebkit.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <title>ZebKit Tester</title>
+    <script>
+    function debug(text) {
+        $("#debug").append(text + "<br/>");
+    }
+
+    zebkit.config["ui.theme.name"] = "light";
+
+    $(document).ready(function() {
+        debug("JQuery is Alive");
+        doZebkit();
+    });
+
+    function doZebkit() {
+
+        zebkit.require("ui", "layout", function(ui, layout) {
+            eval(zebkit.import("ui", "layout"));
+
+            debug("Zebkit is up.");
+
+            var root = new ui.zCanvas("zcanv").root;
+
+            var fieldLayout = new FlowLayout("right", "center");
+            fieldLayout.stretchLast = true;
+            fieldLayout.padding = 9;
+
+            function createField(label, comp, button) {
+                var t = new BoldLabel(label);
+
+                if (arguments.length < 3) {
+                    var p = new Panel({
+                        layout: fieldLayout,
+                        background: "#DEDEDE",
+                        kids: [t, comp]
+                    });
+                } else {
+                    var p = new Panel({
+                        layout: fieldLayout,
+                        kids: [t, new Panel({
+                            layout: new BorderLayout(4),
+                            kids: {
+                                "center": comp,
+                                "right": button
+                            }
+                        })]
+                    });
+                }
+
+                t.setPreferredSize(90, -1);
+                return p;
+            }
+
+            function createMenuPanels() {
+                var p = new CollapsiblePan.GroupPan(
+                    new CollapsiblePan("Page 1", new Panel({
+                        layout: new GridLayout(3, 2, false, true).
+                        setDefaultConstraints(new Constraints(
+                            "stretch", "center", 4
+                        )),
+                        padding: 8,
+                        //background: "#202220",
+                        kids: [
+                            new Label("User name: "),
+                            new TextField("", 8),
+                            new Label("Password: "),
+                            new PassTextField(""),
+                            new Label(""),
+                            new Button("Save").$setConstraints(new Constraints(
+                                "right", "center", 4
+                            ))
+                        ]
+                    })),
+                    new CollapsiblePan("Page 2",
+                        new Panel({
+                            layout: new FlowLayout("center", "center"),
+                            //background: "#202220",
+                            kids: [
+                                new Label("No content is available")
+                            ]
+                        })),
+                    new CollapsiblePan("Page 3", new Label("..."))
+                ).setPreferredSize(220, 350);
+                return p;
+
+            }
+
+            function createLeftPanel() {
+                var p = new ui.Panel({
+                    layout: new layout.ListLayout(8),
+                    kids: {
+                    	"menuP" : createMenuPanels()
+                        // "button0": new ui.Button("Button 0").setId("btn0"),
+                        // "button1": new ui.Button("Button 1").setId("btn1"),
+                        // "button2": new ui.Button("Button 2").setId("btn2"),
+                        // "button3": new ui.Button("Button 3").setId("btn3"),
+                        // "button4": new ui.Button("Button 4").setId("btn4")
+                    }
+                });
+                var b0 = p.byPath("#btn0"),
+                    b1 = p.byPath("#btn1"),
+                    b2 = p.byPath("#btn2"),
+                    b3 = p.byPath("#btn3"),
+                    b4 = p.byPath("#btn4");
+
+                // b0.on(function(e) {
+                //     debug("button0 clicked");
+                //     var p = root.byPath("#pnlCenter");
+                //     p.removeAll();
+                //     p.add("top", createUserPanelContent());
+                // });
+
+                // b1.on(function(e) {
+                //     var p = root.byPath("#pnlCenter");
+                //     p.removeAll();
+                //     p.add("top", createInstrumentsPanelContent());
+                // });
+
+                // b2.on(function(e) {
+                //     debug("button2 clicked");
+                // });
+                // b3.on(function(e) {
+                //     debug("button3 clicked");
+                // });
+
+
+                // var btn0 = p.kids["button0"].on(function(e){
+                // 	alert(e);
+                // });
+                return p;
+            }
+
+            function createTopPanel() {
+                var p = new ui.Panel().setId("pnlTop");
+                return p;
+            }
+
+            function createCenterPanel() {
+                var p = new ui.Panel().setId("pnlCenter");
+
+                p.setLayout(new layout.ListLayout(8));
+                return p;
+            }
+
+            function createRightPanel() {
+                var p = new ui.Panel().setId("pnlRight");
+                return p;
+            }
+
+            function createBottomPanel() {
+                var p = new ui.Panel().setId("pnlBottom");
+                return p;
+            }
+
+            function createUserPanelContent() {
+                var p = new ui.Panel({
+                    layout: new layout.ListLayout(8),
+                    paddings: [4, 32, 16, 24],
+                    kids: {
+                        "firstField": createField("User Name:", new TextField().setPreferredSize(220, -1)),
+                        "secondField": createField("Email:", new TextField().setPreferredSize(220, -1))
+                    }
+                });
+                return p;
+            }
+
+            function createInstrumentsPanelContent() {
+                var p = new ui.Panel({
+                    layout: new layout.ListLayout(8),
+                    kids: {
+                        "firstField": createField("Instrument Type:", new TextField().setPreferredSize(220, -1)),
+                        "secondField": createField("Instrument ID:", new TextField().setPreferredSize(220, -1))
+                    }
+                });
+                return p;
+            }
+
+
+            root.properties({
+                border: "plain",
+                padding: 8,
+                layout: new layout.BorderLayout(6),
+                kids: {
+                    "top": createTopPanel(),
+                    "left": createLeftPanel(),
+                    "center": createCenterPanel(),
+                    "bottom": new ui.Button("test")
+                }
+            });
+        });
+    }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div id="debug"></div>
+            </div>
+            <div class="col-lg-10">
+                <canvas id="zcanv" width="1000" height="500"></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
