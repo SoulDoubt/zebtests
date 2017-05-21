@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nothing But JQuery and Bootstrap</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="scripts/bootstrap-treeview.min.js"></script>
+    <script src="scripts/datatable.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-treeview.min.css">
+    <style>
+    	.selectedTableRow{
+    		background-color: #428bca;
+    		color: white;
+
+    	}
+    </style>
+    <script>
+    function getTreeData() {
+        var tree = [{
+            text: "Accutron Flow Trax",
+            icon: "glyphicon glyphicon-home",
+            nodes: [{
+                text: "Users",
+                icon: "glyphicon glyphicon-user"
+            }, {
+                text: "Instruments",
+                icon: "glyphicon glyphicon-cog"
+            }]
+        }];
+        return tree;
+    }
+
+    function getUserList() {
+        var users = [{
+            id: 0,
+            name: "Allan",
+            permissions: "rwx"
+        }, {
+            id: 1,
+            name: "Mike",
+            permissions: "rwx"
+        }, {
+            id: 2,
+            name: "Richard",
+            permissions: "r-x"
+        }, {
+            id: 3,
+            name: "Doug",
+            permissions: "r--"
+        }, ];
+
+        return users;
+    }
+
+    $(document).ready(function() {
+        $("#menutree").treeview({
+            data: getTreeData(),
+            onNodeSelected: function(e, node) {
+                console.log(node);
+                $(".content-pane").hide();
+                if (node.text === "Users") {
+                    $("#usermanager").DataTable({
+                        data: getUserList(),
+                        edit: true                        
+                    });
+                    $("#usermanager").show();
+
+                } else {
+
+                }
+            }
+
+        });
+
+
+        function BuildUserTable() {
+            var data = getUserList(),
+                $tbl = $("<table/>").addClass("table table-striped table-bordered"),
+                $hdr = $("<thead/>"),
+                $bdy = $("<tbody/>"),
+                $tr, $td;
+            $hdr.append($("<th/>").text("#").addClass("text-center"));
+            $hdr.append($("<th/>").text("Name").addClass("text-center"));
+            $hdr.append($("<th/>").text("Permissions").addClass("text-center"));
+
+            $.each(data, function(idx, val) {
+                $tr = $("<tr/>");
+                $td = $("<td/>").text(idx);
+                $tr.append($td);
+                $td = $("<td/>").text(val.name);
+                $tr.append($td);
+                $td = $("<td/>").text(val.permissions);
+                $tr.append($td);
+                $bdy.append($tr);
+            });
+
+            $tbl.append($hdr);
+            $tbl.append($bdy);
+
+
+            $("#usermanager").show();
+            $("#usermanager").empty();
+            $("#usermanager").append($tbl);
+        }
+    });
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">
+                    <img src="images/logo-accutron.svg" alt="Accutron Instruments" height="48" width="180" style="margin-top: -14px">
+                </a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4">
+                <div id="menutree"></div>
+            </div>
+            <div class="col-lg-9 col-md-8">
+                <div id="usermanager" class="content-pane">
+                </div>
+                <div id="instrumentmanager" class="content-pane">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

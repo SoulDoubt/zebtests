@@ -32,6 +32,18 @@
             fieldLayout.stretchLast = true;
             fieldLayout.padding = 9;
 
+            function createDumbMenu() {
+                var tree = new ui.tree.Tree({
+                    value: new Label("Label root item"),
+                    kids: [
+                        new Checkbox("Checkbox Item"),
+                        new Button("Button item"),
+                        new Combo(["Combo item 1", "Combo item 2"])
+                    ]
+                });
+                return tree;
+            }
+
             function createField(label, comp, button) {
                 var t = new BoldLabel(label);
 
@@ -60,25 +72,16 @@
 
             function createMenuPanels() {
                 var p = new CollapsiblePan.GroupPan(
-                    new CollapsiblePan("Page 1", new Panel({
-                        layout: new GridLayout(3, 2, false, true).
-                        setDefaultConstraints(new Constraints(
-                            "stretch", "center", 4
-                        )),
+                    new CollapsiblePan("Users", new Panel({
+                        layout: new ListLayout(6),                                               
                         padding: 8,
                         //background: "#202220",
                         kids: [
-                            new Label("User name: "),
-                            new TextField("", 8),
-                            new Label("Password: "),
-                            new PassTextField(""),
-                            new Label(""),
-                            new Button("Save").$setConstraints(new Constraints(
-                                "right", "center", 4
-                            ))
+                            new Button("@(images/jays.png):48x48Manage Accounts").setId("btn0"),
+                            new Button("@(images/jays.png):48x48Other Things").setId("btn1")
                         ]
                     })),
-                    new CollapsiblePan("Page 2",
+                    new CollapsiblePan("Instruments",
                         new Panel({
                             layout: new FlowLayout("center", "center"),
                             //background: "#202220",
@@ -86,7 +89,7 @@
                                 new Label("No content is available")
                             ]
                         })),
-                    new CollapsiblePan("Page 3", new Label("..."))
+                    new CollapsiblePan("Data", new Label("..."))
                 ).setPreferredSize(220, 350);
                 return p;
 
@@ -96,12 +99,13 @@
                 var p = new ui.Panel({
                     layout: new layout.ListLayout(8),
                     kids: {
-                    	"menuP" : createMenuPanels()
-                        // "button0": new ui.Button("Button 0").setId("btn0"),
-                        // "button1": new ui.Button("Button 1").setId("btn1"),
-                        // "button2": new ui.Button("Button 2").setId("btn2"),
-                        // "button3": new ui.Button("Button 3").setId("btn3"),
-                        // "button4": new ui.Button("Button 4").setId("btn4")
+                        "menuP": createMenuPanels()
+                        //"center": createDumbMenu()
+                            // "button0": new ui.Button("Button 0").setId("btn0"),
+                            // "button1": new ui.Button("Button 1").setId("btn1"),
+                            // "button2": new ui.Button("Button 2").setId("btn2"),
+                            // "button3": new ui.Button("Button 3").setId("btn3"),
+                            // "button4": new ui.Button("Button 4").setId("btn4")
                     }
                 });
                 var b0 = p.byPath("#btn0"),
@@ -110,18 +114,18 @@
                     b3 = p.byPath("#btn3"),
                     b4 = p.byPath("#btn4");
 
-                // b0.on(function(e) {
-                //     debug("button0 clicked");
-                //     var p = root.byPath("#pnlCenter");
-                //     p.removeAll();
-                //     p.add("top", createUserPanelContent());
-                // });
+                b0.on(function(e) {
+                    debug("button0 clicked");
+                    var p = root.byPath("#pnlCenter");
+                    p.removeAll();
+                    p.add("top", createUserPanelContent());
+                });
 
-                // b1.on(function(e) {
-                //     var p = root.byPath("#pnlCenter");
-                //     p.removeAll();
-                //     p.add("top", createInstrumentsPanelContent());
-                // });
+                b1.on(function(e) {
+                    var p = root.byPath("#pnlCenter");
+                    p.removeAll();
+                    p.add("top", createInstrumentsPanelContent());
+                });
 
                 // b2.on(function(e) {
                 //     debug("button2 clicked");

@@ -539,7 +539,7 @@
 
     "CollapsiblePan": {
         "Label":{
-            "font"  : "%{boldFont}",
+            "font"  : "Consolas 22 bold",
             "color" : "%{palette.white}"
         },
 
