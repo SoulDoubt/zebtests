@@ -13,10 +13,25 @@
     	.selectedTableRow{
     		background-color: #428bca;
     		color: white;
-
     	}
     </style>
     <script>
+
+    var ws = new WebSocket("ws://localhost:3000");
+
+    ws.addEventListener('open', function (event) {
+        // var msg = {
+        //     "command" : "connect",
+        //     "data" : "null"
+        // }
+        // ws.send(JSON.stringify(msg));
+    });
+
+    ws.addEventListener('message', function(event){
+        console.log(event.data);
+    });
+
+    
     function getTreeData() {
         var tree = [{
             text: "Accutron Flow Trax",
@@ -59,6 +74,11 @@
             data: getTreeData(),
             onNodeSelected: function(e, node) {
                 console.log(node);
+                var wsdata = {
+                    "command" : "fetch",
+                    "dataID" : 12345678
+                };
+    ws.send(JSON.stringify(wsdata));
                 $(".content-pane").hide();
                 if (node.text === "Users") {
                     $("#usermanager").DataTable({
