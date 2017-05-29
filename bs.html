@@ -78,7 +78,7 @@
                     "command" : "fetch",
                     "dataID" : 12345678
                 };
-    ws.send(JSON.stringify(wsdata));
+                ws.send(JSON.stringify(wsdata));
                 $(".content-pane").hide();
                 if (node.text === "Users") {
                     $("#usermanager").DataTable({

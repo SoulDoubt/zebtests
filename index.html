@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
     <script src="scripts/zebkit.js"></script>
+    <script src="scripts/smoothie.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <title>ZebKit Tester</title>
     <script>
@@ -12,19 +13,95 @@
         $("#debug").append(text + "<br/>");
     }
 
-    zebkit.config["ui.theme.name"] = "light";
+    //zebkit.config["ui.theme.name"] = "light";
+
+    var ws_command = null;
+    var ws_other = null;
+    var sineWave = null;
+
+
 
     $(document).ready(function() {
-        debug("JQuery is Alive");
-        doZebkit();
+
+        var chart = new SmoothieChart({
+                interpolation: 'bezier',
+                minValue: -1.5,
+                maxValue: 1.5
+            }),
+            canvas = document.getElementById('myChart'),
+            sineWave = new TimeSeries();
+
+        chart.addTimeSeries(sineWave, {
+            lineWidth: 2,
+            strokeStyle: '#00ff00'
+        });
+        chart.streamTo(canvas, 1000);
+
+        var otherChart = new SmoothieChart({
+                interpolation: 'bezier',
+                minValue: 0.5,
+                maxValue: 2.5
+            }),
+            otherCanvas = document.getElementById('otherChart'),
+            randValues = new TimeSeries();
+
+        otherChart.addTimeSeries(randValues, {
+            lineWidth: 2,
+            strokeStyle: '#00ff00'
+        });
+        otherChart.streamTo(otherCanvas, 1000);
+
+
+        ws_command = new WebSocket("ws://localhost:9090/command");
+        ws_command.onopen = function() {
+            $("#debug").append("WebSocket: Command is open..." + "<br/>");
+        };
+
+        ws_command.onerror = function(error) {
+            $("#debug").append("WS Command ERROR: " + error,data + "<br/>");
+        };
+
+        ws_command.onmessage = function(event) {
+            //console.log(event.data);
+            var js = JSON.parse(event.data);
+            //$("#debug").append("Command MSG: " + event.data + "<br/>");
+            var dt = new Date(js.time);
+            //console.log(js);
+            sineWave.append(dt, js.value);
+        }
+
+        ws_other = new WebSocket("ws://localhost:9090/other");
+        ws_other.onopen = function() {
+            $("#debug").append("WebSocket: Other is open..." + "<br/>");
+        };
+
+        ws_other.onerror = function(error) {
+            $("#debug").append("WS Other ERROR: " + error.data + "<br/>");
+        };
+
+        ws_other.onmessage = function(event) {
+            //console.log(event.data);
+            var js = JSON.parse(event.data);
+            //$("#debug").append("Command MSG: " + event.data + "<br/>");
+            var dt = new Date(js.time);
+            //console.log(js);
+            randValues.append(dt, js.value);
+        }
+
     });
+
+
+
+    function initChart() {
+
+    }
 
     function doZebkit() {
 
         zebkit.require("ui", "layout", function(ui, layout) {
             eval(zebkit.import("ui", "layout"));
 
-            debug("Zebkit is up.");
+            debug("Zebkit is alive.");
 
             var root = new ui.zCanvas("zcanv").root;
 
@@ -73,7 +150,7 @@
             function createMenuPanels() {
                 var p = new CollapsiblePan.GroupPan(
                     new CollapsiblePan("Users", new Panel({
-                        layout: new ListLayout(6),                                               
+                        layout: new ListLayout(6),
                         padding: 8,
                         //background: "#202220",
                         kids: [
@@ -100,7 +177,7 @@
                     layout: new layout.ListLayout(8),
                     kids: {
                         "menuP": createMenuPanels()
-                        //"center": createDumbMenu()
+                            //"center": createDumbMenu()
                             // "button0": new ui.Button("Button 0").setId("btn0"),
                             // "button1": new ui.Button("Button 1").setId("btn1"),
                             // "button2": new ui.Button("Button 2").setId("btn2"),
@@ -115,6 +192,18 @@
                     b4 = p.byPath("#btn4");
 
                 b0.on(function(e) {
+                    ws_other = new WebSocket("ws://localhost:9090/other");
+                    ws_other.onopen = function() {
+                        $("#debug").append("WebSocket: Other is open..." + "<br/>");
+                    };
+
+                    ws_other.onerror = function(error) {
+                        $("#debug").append("WebSocket: Other ERROR: " + error + "<br/>");
+                    };
+
+                    ws_other.onmessage = function(event) {
+                        $("#debug").append("WebSocket: Other MSG: " + event.data + "<br/>");
+                    };
                     debug("button0 clicked");
                     var p = root.byPath("#pnlCenter");
                     p.removeAll();
@@ -136,7 +225,7 @@
 
 
                 // var btn0 = p.kids["button0"].on(function(e){
-                // 	alert(e);
+                //  alert(e);
                 // });
                 return p;
             }
@@ -210,7 +299,9 @@
                 <div id="debug"></div>
             </div>
             <div class="col-lg-10">
-                <canvas id="zcanv" width="1000" height="500"></canvas>
+                <!-- <canvas id="zcanv" width="1000" height="500"></canvas> -->
+                <canvas id="myChart" width="600" height="200"></canvas>
+                <canvas id="otherChart" width="600" height="200"></canvas>
             </div>
         </div>
     </div>
