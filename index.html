@@ -24,7 +24,7 @@
     $(document).ready(function() {
 
         var chart = new SmoothieChart({
-                interpolation: 'bezier',
+                interpolation: 'linear',
                 minValue: -1.5,
                 maxValue: 1.5
             }),
@@ -38,7 +38,7 @@
         chart.streamTo(canvas, 1000);
 
         var otherChart = new SmoothieChart({
-                interpolation: 'bezier',
+                interpolation: 'linear',
                 minValue: 0.5,
                 maxValue: 2.5
             }),
@@ -65,8 +65,8 @@
             //console.log(event.data);
             var js = JSON.parse(event.data);
             //$("#debug").append("Command MSG: " + event.data + "<br/>");
-            var dt = new Date(js.time);
-            //console.log(js);
+            var dt = new Date();
+            console.log(js);
             sineWave.append(dt, js.value);
         }
 
@@ -83,10 +83,12 @@
             //console.log(event.data);
             var js = JSON.parse(event.data);
             //$("#debug").append("Command MSG: " + event.data + "<br/>");
-            var dt = new Date(js.time);
+            var dt = new Date();
             //console.log(js);
             randValues.append(dt, js.value);
         }
+
+        setInterval(function(){ ws_command.send("hello"); }, 1000);
 
     });
 

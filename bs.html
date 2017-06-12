@@ -5,21 +5,21 @@
     <meta charset="UTF-8">
     <title>Nothing But JQuery and Bootstrap</title>
     <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.css">
     <script src="scripts/bootstrap-treeview.min.js"></script>
     <script src="scripts/datatable.js"></script>
     <link rel="stylesheet" href="css/bootstrap-treeview.min.css">
     <style>
-    	.selectedTableRow{
-    		background-color: #428bca;
-    		color: white;
-    	}
+    .selectedTableRow {
+        background-color: #428bca;
+        color: white;
+    }
     </style>
     <script>
-
     var ws = new WebSocket("ws://localhost:3000");
 
-    ws.addEventListener('open', function (event) {
+    ws.addEventListener('open', function(event) {
         // var msg = {
         //     "command" : "connect",
         //     "data" : "null"
@@ -27,11 +27,11 @@
         // ws.send(JSON.stringify(msg));
     });
 
-    ws.addEventListener('message', function(event){
+    ws.addEventListener('message', function(event) {
         console.log(event.data);
     });
 
-    
+
     function getTreeData() {
         var tree = [{
             text: "Accutron Flow Trax",
@@ -75,15 +75,16 @@
             onNodeSelected: function(e, node) {
                 console.log(node);
                 var wsdata = {
-                    "command" : "fetch",
-                    "dataID" : 12345678
+                    "command": "fetch",
+                    "dataID": 12345678
                 };
                 ws.send(JSON.stringify(wsdata));
                 $(".content-pane").hide();
                 if (node.text === "Users") {
                     $("#usermanager").DataTable({
                         data: getUserList(),
-                        edit: true                        
+                        edit: true,
+                        tableClasses: ['table', 'table-condensed', 'table-bordered']
                     });
                     $("#usermanager").show();
 
@@ -94,36 +95,7 @@
 
         });
 
-
-        function BuildUserTable() {
-            var data = getUserList(),
-                $tbl = $("<table/>").addClass("table table-striped table-bordered"),
-                $hdr = $("<thead/>"),
-                $bdy = $("<tbody/>"),
-                $tr, $td;
-            $hdr.append($("<th/>").text("#").addClass("text-center"));
-            $hdr.append($("<th/>").text("Name").addClass("text-center"));
-            $hdr.append($("<th/>").text("Permissions").addClass("text-center"));
-
-            $.each(data, function(idx, val) {
-                $tr = $("<tr/>");
-                $td = $("<td/>").text(idx);
-                $tr.append($td);
-                $td = $("<td/>").text(val.name);
-                $tr.append($td);
-                $td = $("<td/>").text(val.permissions);
-                $tr.append($td);
-                $bdy.append($tr);
-            });
-
-            $tbl.append($hdr);
-            $tbl.append($bdy);
-
-
-            $("#usermanager").show();
-            $("#usermanager").empty();
-            $("#usermanager").append($tbl);
-        }
+       
     });
     </script>
 </head>
@@ -151,6 +123,26 @@
             </div>
         </div>
     </div>
+    <!-- modal placeholder -->
+    <div id="inputModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-default">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- // end modal placeholder -->
 </body>
 
 </html>
